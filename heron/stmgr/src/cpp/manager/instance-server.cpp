@@ -157,9 +157,9 @@ InstanceServer::~InstanceServer() {
     }
   }
 
-  for (auto qmmIter = connection_buffer_length_metric_map_.begin();
-        qmmIter != connection_buffer_length_metric_map_.end(); ++qmmIter) {
-      const sp_string& instance_id = qmmIter->first;
+  for (auto qlmIter = connection_buffer_length_metric_map_.begin();
+        qlmIter != connection_buffer_length_metric_map_.end(); ++qlmIter) {
+      const sp_string& instance_id = qlmIter->first;
       for (auto iter = instance_info_.begin(); iter != instance_info_.end(); ++iter) {
         if (iter->second->instance_->instance_id() != instance_id) continue;
         InstanceData* data = iter->second;
@@ -167,7 +167,7 @@ InstanceServer::~InstanceServer() {
         if (!iConn) break;
         sp_string metric_name = MakeQueueLengthCompIdMetricName(instance_id);
         metrics_manager_client_->unregister_metric(metric_name);
-        delete qmmIter->second;
+        delete qlmIter->second;
       }
     }
 
@@ -276,8 +276,8 @@ void InstanceServer::HandleConnectionClose(Connection* _conn, NetworkErrorCode) 
     }
 
     // Clean the connection_buffer_length_metric_map_
-    auto qsmmiter = connection_buffer_length_metric_map_.find(instance_id);
-    if (qsmmiter != connection_buffer_length_metric_map_.end()) {
+    auto qlmmiter = connection_buffer_length_metric_map_.find(instance_id);
+    if (qlmmiter != connection_buffer_length_metric_map_.end()) {
       metrics_manager_client_->unregister_metric(MakeQueueLengthCompIdMetricName(instance_id));
       delete connection_buffer_length_metric_map_[instance_id];
       connection_buffer_length_metric_map_.erase(instance_id);
