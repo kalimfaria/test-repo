@@ -159,9 +159,13 @@ class InstanceServer : public Server {
   typedef std::unordered_map<sp_string, heron::common::TimeSpentMetric*> InstanceMetricMap;
   InstanceMetricMap instance_metric_map_;
 
-  // map of Instance_id to queue metric
+  // map of Instance_id to queue bytes metric
   typedef std::unordered_map<sp_string, heron::common::MultiMeanMetric*> ConnectionBufferMetricMap;
   ConnectionBufferMetricMap connection_buffer_metric_map_;
+
+  // map of Instance_id to queue size metric
+  typedef std::unordered_map<sp_string, heron::common::MultiCountMetric*> ConnectionBufferSizeMetricMap;
+  ConnectionBufferSizeMetricMap connection_buffer_size_metric_map_;
 
   // instances/ causing back pressure
   std::unordered_set<sp_string> remote_ends_who_caused_back_pressure_;
