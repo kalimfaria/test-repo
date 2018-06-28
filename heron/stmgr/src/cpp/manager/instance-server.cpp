@@ -164,7 +164,7 @@ InstanceServer::~InstanceServer() {
         InstanceData* data = iter->second;
         Connection* iConn = data->conn_;
         if (!iConn) break;
-        sp_string metric_name = MakeQueueCompSizeIdMetricName(instance_id);
+        sp_string metric_name = MakeQueueSizeCompIdMetricName(instance_id);
         metrics_manager_client_->unregister_metric(metric_name);
         delete qmmIter->second;
       }
@@ -216,7 +216,7 @@ void InstanceServer::UpdateQueueMetrics(EventLoop::Status) {
     const sp_string& instance_id = instance_info_[task_id]->instance_->instance_id();
     sp_int32 bytes = itr->first->getOutstandingBytes();
     connection_buffer_metric_map_[instance_id]->scope("bytes")->record(bytes);
-    connection_buffer_size_metric_map_[instance_id]->scope("packets")->incr(1);
+    connection_buffer_size_metric_map_[instance_id]->scope("packets")->incr();
   }
 }
 
@@ -275,12 +275,12 @@ void InstanceServer::HandleConnectionClose(Connection* _conn, NetworkErrorCode) 
     }
 
     // Clean the connection_buffer_size_metric_map_
-        auto qmmiter = connection_buffer_size_metric_map_.find(instance_id);
-        if (qmmiter != connection_buffer_size_metric_map_.end()) {
-          metrics_manager_client_->unregister_metric(MakeQueueSizeCompIdMetricName(instance_id));
-          delete connection_buffer_size_metric_map_[instance_id];
-          connection_buffer_size_metric_map_.erase(instance_id);
-        }
+    auto qsmmiter = connection_buffer_size_metric_map_.find(instance_id);
+    if (qsmmiter != connection_buffer_size_metric_map_.end()) {
+      metrics_manager_client_->unregister_metric(MakeQueueSizeCompIdMetricName(instance_id));
+      delete connection_buffer_size_metric_map_[instance_id];
+      connection_buffer_size_metric_map_.erase(instance_id);
+    }
 
     stmgr_->HandleDeadInstance(task_id);
   }
@@ -344,7 +344,8 @@ void InstanceServer::HandleRegisterInstanceRequest(REQID _reqid, Connection* _co
                                                queue_metric);
       connection_buffer_metric_map_[instance_id] = queue_metric;
     }
-    if (connection_buffer_size_metric_map_.find(instance_id) == connection_buffer_size_metric_map_.end()) {
+    if (connection_buffer_size_metric_map_.find(instance_id)
+      == connection_buffer_size_metric_map_.end()) {
       auto queue_size_metric = new heron::common::MultiCountMetric();
       metrics_manager_client_->register_metric(MakeQueueSizeCompIdMetricName(instance_id),
                                                queue_size_metric);
