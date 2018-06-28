@@ -103,8 +103,8 @@ class InstanceServer : public Server {
   void DrainTupleStream(proto::stmgr::TupleStreamMessage* _message);
   void DrainCheckpoint(sp_int32 _task_id, proto::ckptmgr::InitiateStatefulCheckpoint* _message);
   sp_string MakeBackPressureCompIdMetricName(const sp_string& instanceid);
-  sp_string MakeQueueCompIdMetricName(const sp_string& instanceid);
   sp_string MakeQueueSizeCompIdMetricName(const sp_string& instanceid);
+  sp_string MakeQueueLengthCompIdMetricName(const sp_string& instanceid);
   sp_string GetInstanceName(Connection* _connection);
   void UpdateQueueMetrics(EventLoop::Status);
 
@@ -164,10 +164,10 @@ class InstanceServer : public Server {
   typedef std::unordered_map<sp_string, heron::common::MultiMeanMetric*> ConnectionBufferMetricMap;
   ConnectionBufferMetricMap connection_buffer_metric_map_;
 
-  // map of Instance_id to queue size metric
+  // map of Instance_id to queue length metric
   typedef std::unordered_map<sp_string, heron::common::MultiCountMetric*>
-   ConnectionBufferSizeMetricMap;
-  ConnectionBufferSizeMetricMap connection_buffer_size_metric_map_;
+   ConnectionBufferLengthMetricMap;
+  ConnectionBufferLengthMetricMap connection_buffer_length_metric_map_;
 
   // instances/ causing back pressure
   std::unordered_set<sp_string> remote_ends_who_caused_back_pressure_;
