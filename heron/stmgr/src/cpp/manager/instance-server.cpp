@@ -276,8 +276,8 @@ void InstanceServer::HandleConnectionClose(Connection* _conn, NetworkErrorCode) 
     }
 
     // Clean the connection_buffer_length_metric_map_
-    auto qlmmiter = connection_buffer_length_metric_map_.find(instance_id);
-    if (qlmmiter != connection_buffer_length_metric_map_.end()) {
+    auto qlmiter = connection_buffer_length_metric_map_.find(instance_id);
+    if (qlmiter != connection_buffer_length_metric_map_.end()) {
       metrics_manager_client_->unregister_metric(MakeQueueLengthCompIdMetricName(instance_id));
       delete connection_buffer_length_metric_map_[instance_id];
       connection_buffer_length_metric_map_.erase(instance_id);
@@ -347,10 +347,10 @@ void InstanceServer::HandleRegisterInstanceRequest(REQID _reqid, Connection* _co
     }
     if (connection_buffer_length_metric_map_.find(instance_id)
       == connection_buffer_length_metric_map_.end()) {
-      auto queue_size_metric = new heron::common::MultiCountMetric();
+      auto queue_length_metric = new heron::common::MultiCountMetric();
       metrics_manager_client_->register_metric(MakeQueueLengthCompIdMetricName(instance_id),
-                                               queue_size_metric);
-      connection_buffer_length_metric_map_[instance_id] = queue_size_metric;
+                                               queue_length_metric);
+      connection_buffer_length_metric_map_[instance_id] = queue_length_metric;
     }
     instance_info_[task_id]->set_connection(_conn);
 
